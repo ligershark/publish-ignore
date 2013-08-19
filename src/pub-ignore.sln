@@ -3,6 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PubIgnore.Tasks", "PubIgnore.Tasks\PubIgnore.Tasks.csproj", "{686972E4-30FA-4E4E-8794-3C3A4687017C}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "targets", "targets", "{F1E17BB7-5B7B-423E-94F4-140D7DAFA15D}"
+	ProjectSection(SolutionItems) = preProject
+		ligreshark.pubignore.targets = ligreshark.pubignore.targets
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

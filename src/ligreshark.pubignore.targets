@@ -1,0 +1,70 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <PropertyGroup>
+    <ls-PublishIgnoreTaskPath Condition=" '$(ls-PublishIgnoreTaskPath)'=='' ">$(MSBuildProjectDirectory)\PubIgnore.Tasks.dll</ls-PublishIgnoreTaskPath>
+  </PropertyGroup>
+  
+  <UsingTask TaskName ="ReadPublishIgnoreFile" AssemblyFile="$(ls-PublishIgnoreTaskPath)" />
+    
+  <!-- 
+  This file can be imported into a WAP to support ignoreing files to be publish
+  via a .publishIgnore file.
+  -->
+
+  <PropertyGroup>
+    <ls-ExcludeFilesByPublishIgnoreDependsOn>
+      $(ls-ExcludeFilesByPublishIgnoreDependsOn);
+      ls-FindPubIgnoreFiles;
+      ls-core-ExcludeFilesByPublishIgnore;
+    </ls-ExcludeFilesByPublishIgnoreDependsOn>
+  </PropertyGroup>
+  
+  <Target Name="ls-ExcludeFilesByPublishIgnore" DependsOnTargets="$(ls-ExcludeFilesByPublishIgnoreDependsOn)" />
+
+  <Target Name="ls-FindPubIgnoreFiles">
+    <!-- For now let's just read the root folder, later we can support .publishIgnore files is other folders -->
+    <ItemGroup>
+      <PubIgnoreFiles Include="$(MSBuildProjectDirectory)\.publishIgnore" Condition=" Exists('$(MSBuildProjectDirectory)\.publishIgnore') "/>
+    </ItemGroup>
+  </Target>
+  
+  <!--
+  This target will be executed once per .publishIgnore file
+  -->
+  <PropertyGroup>
+    <ls-core-ExcludeFilesByPublishIgnoreDependsOn>
+      $(ls-core-ExcludeFilesByPublishIgnore);
+      ls-FindPubIgnoreFiles;
+    </ls-core-ExcludeFilesByPublishIgnoreDependsOn>
+  </PropertyGroup>
+  
+  <Target Name="ls-core-ExcludeFilesByPublishIgnore" 
+          Outputs="%(PubIgnoreFiles.Identity)" 
+          DependsOnTargets="$(ls-core-ExcludeFilesByPublishIgnoreDependsOn)"
+          BeforeTargets="ExcludeFilesFromPackage">
+    <!-- Read the file and add the patterns to the ExcludeFromPackageFiles item -->
+
+    <!-- 
+    TODO: when supporting more than just the .publishIngore in the root we will
+          need to prefix the lines from the file with the relative path.
+    -->
+    <ReadPublishIgnoreFile FilePath="%(PubIgnoreFiles.Identity)">
+      <Output TaskParameter="LinesFromFile" ItemName="_ls-PubIgnore-LinesRead"/>
+    </ReadPublishIgnoreFile>
+
+    <Message Text="**** Before ExcludeFromPackageFiles: @(ExcludeFromPackageFiles)" Importance="high" />
+    
+    <!-- Populate the ExcludeFromPackageFiles item -->
+    <Message Text="Adding the following patterns to ExcludeFromPackageFiles: %0a%0d    @(_ls-PubIgnore-LinesRead->'%(Identity,'%0a0d    ')')" />
+    
+    <ItemGroup>
+      <ExcludeFromPackageFiles Include="%(_ls-PubIgnore-LinesRead.Identity)">
+        <FromTarget>ls-PublishIgnore</FromTarget>
+      </ExcludeFromPackageFiles>
+    </ItemGroup>
+    
+    <Message Text="**** Before ExcludeFromPackageFiles: @(ExcludeFromPackageFiles)" Importance="high" />
+  </Target>
+  
+</Project>
