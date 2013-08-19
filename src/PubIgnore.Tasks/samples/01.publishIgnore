@@ -1,0 +1,8 @@
+﻿
+# this is a comment
+
+sample.html
+
+*.temp
+foo/
+bar/**/*.txt

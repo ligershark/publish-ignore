@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Demo" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <UsingTask TaskName ="ReadPublishIgnoreFile" AssemblyFile="C:\temp\msbuild\custom-tasks\PubIgnore.Tasks.dll" />
+
+  <PropertyGroup>
+    <FileToRead Condition=" '$(FileToRead)'=='' ">$(MSBuildProjectDirectory)\01.publishIgnore</FileToRead>
+  </PropertyGroup>
+  
+  <Target Name="Demo">
+    <ReadPublishIgnoreFile FilePath="$(FileToRead)">
+      <Output TaskParameter="LinesFromFile" ItemName="LinesRead"/>
+    </ReadPublishIgnoreFile>
+
+    <Message Text="Lines read from file [$(FileToRead)]:%0a%0d@(LinesRead,'%0a%0d') "/>
+    
+  </Target>
+  
+</Project>

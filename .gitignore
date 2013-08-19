@@ -1,0 +1,25 @@
+# Folders to ignore #
+OutputRoot/
+TestResults/
+bin/
+obj/
+_UpgradeReport_Files/
+.svn/
+Backups/
+TestBackup/
+csx/
+packages/
+BuildOutput/
+
+# Known files to ignore always #
+*.suo
+*.user
+~*.docx
+*build.log
+*build.*.log
+.dbshell
+*.private
+UpgradeLog*.xml
+UpgradeLog*.htm
+*.metaproj
+*.metaproj.tmp
