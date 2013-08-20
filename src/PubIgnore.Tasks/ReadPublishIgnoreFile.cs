@@ -1,6 +1,7 @@
 ﻿namespace PubIgnore.Tasks {
     using Microsoft.Build.Framework;
     using Microsoft.Build.Utilities;
+    using System;
     using System.Collections.Generic;
     using System.IO;
 
@@ -19,6 +20,7 @@
         public ITaskItem[] LinesFromFile { get; set; }        
 
         public override bool Execute() {
+            System.Diagnostics.Debugger.Launch();
             // read the file line by line and exclude any lines which start with # or 
             //  just contain whitespace
             Log.LogMessage("Starting to read .publishignore file at [{0}]", this.FilePath);
@@ -38,12 +40,12 @@
                     continue;
 
                 // trim the line and see if it starts with #
-                string lineTrimmed = line.TrimStart();
-                if (lineTrimmed.StartsWith("#"))
+                string pattern = this.ConvertPatternIfNecessary(line);
+                if (pattern.StartsWith("#"))
                     continue;
 
                 // add it to the list to be returned
-                linesNotComments.Add(new TaskItem(lineTrimmed));
+                linesNotComments.Add(new TaskItem(pattern));
             }
 
             this.LinesFromFile = linesNotComments.ToArray();
@@ -51,6 +53,24 @@
             Log.LogMessage("Finished reading .publishIgnore file at [{0}]. Found [{0}] lines which are not comments or blank.", this.FilePath, this.LinesFromFile.Length);
 
             return !Log.HasLoggedErrors;
+        }
+
+        internal string ConvertPatternIfNecessary(string pattern) {
+            if (string.IsNullOrEmpty(pattern)) {
+                return pattern;
+            }
+
+            string convertedPattern = pattern.Trim();
+            if (convertedPattern.StartsWith("!")) {
+                throw new NotSupportedException("The ! operator is not currently supported in .publishignore");
+            }
+
+            // if its a directory we should append **\* to the end
+            if (convertedPattern.EndsWith(@"/") || convertedPattern.EndsWith(@"\")) {
+                convertedPattern = string.Format(@"{0}**\*",convertedPattern);
+            }
+
+            return convertedPattern;
         }
     }
 }

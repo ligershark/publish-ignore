@@ -4,14 +4,7 @@
   via a .publishIgnore file.
   -->
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <!-- The section below is only needed for debugging, the task is inline otherwise. -->
-  <!--
-  <PropertyGroup>
-    <ls-PublishIgnoreTaskPath Condition=" '$(ls-PublishIgnoreTaskPath)'=='' ">$(MSBuildProjectDirectory)\PubIgnore.Tasks.dll</ls-PublishIgnoreTaskPath>
-  </PropertyGroup>
   
-  <UsingTask TaskName ="ReadPublishIgnoreFile" AssemblyFile="$(ls-PublishIgnoreTaskPath)" />
-  -->
   
   <PropertyGroup>
     <ls-ExcludeFilesByPublishIgnoreDependsOn>
@@ -65,7 +58,13 @@
   </Target>
   
   <!-- Tasks defined below -->
-  <UsingTask TaskName="ReadPublishIgnoreFile" TaskFactory="CodeTaskFactory" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.v4.0.dll">
+  <PropertyGroup>
+    <ls-DefineReadPublishIgnoreFileInline Condition =" '$(ls-DefineReadPublishIgnoreFileInline)' == '' ">true</ls-DefineReadPublishIgnoreFileInline>
+  </PropertyGroup>
+  <UsingTask TaskName="ReadPublishIgnoreFile" 
+             TaskFactory="CodeTaskFactory" 
+             Condition=" '$(ls-PublishIgnoreTaskPath)'=='true' "
+             AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.v4.0.dll">
     <ParameterGroup>
       <FilePath ParameterType="System.String" Required="true"/>
 
@@ -117,4 +116,17 @@
       </Code>
     </Task>
   </UsingTask>
+
+
+  <!-- 
+  The section below is only needed for debugging.
+  If un-commented it will take precedence over the inline task above.
+  You should also set ls-DefineReadPublishIgnoreFileInline=false from the cmd line.
+  -->  
+  <PropertyGroup>
+    <ls-PublishIgnoreTaskPath Condition=" '$(ls-PublishIgnoreTaskPath)'=='' ">$(MSBuildProjectDirectory)\PubIgnore.Tasks.dll</ls-PublishIgnoreTaskPath>
+  </PropertyGroup>
+  
+  <UsingTask TaskName ="ReadPublishIgnoreFile" AssemblyFile="$(ls-PublishIgnoreTaskPath)" />
+  
 </Project>
