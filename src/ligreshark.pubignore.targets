@@ -65,7 +65,7 @@
   </Target>
   
   <!-- Tasks defined below -->
-  <UsingTask TaskName="GetItemTemplateNameFromVSTemplatePath" TaskFactory="CodeTaskFactory" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.v4.0.dll">
+  <UsingTask TaskName="ReadPublishIgnoreFile" TaskFactory="CodeTaskFactory" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.v4.0.dll">
     <ParameterGroup>
       <FilePath ParameterType="System.String" Required="true"/>
 
