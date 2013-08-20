@@ -123,10 +123,10 @@
   If un-commented it will take precedence over the inline task above.
   You should also set ls-DefineReadPublishIgnoreFileInline=false from the cmd line.
   -->  
-  <PropertyGroup>
+  <!--<PropertyGroup>
     <ls-PublishIgnoreTaskPath Condition=" '$(ls-PublishIgnoreTaskPath)'=='' ">$(MSBuildProjectDirectory)\PubIgnore.Tasks.dll</ls-PublishIgnoreTaskPath>
   </PropertyGroup>
   
-  <UsingTask TaskName ="ReadPublishIgnoreFile" AssemblyFile="$(ls-PublishIgnoreTaskPath)" />
+  <UsingTask TaskName ="ReadPublishIgnoreFile" AssemblyFile="$(ls-PublishIgnoreTaskPath)" />-->
   
 </Project>
