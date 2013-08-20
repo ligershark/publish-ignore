@@ -1,17 +1,18 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+  This file can be imported into a WAP to support ignoreing files to be publish
+  via a .publishIgnore file.
+  -->
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-
+  <!-- The section below is only needed for debugging, the task is inline otherwise. -->
+  <!--
   <PropertyGroup>
     <ls-PublishIgnoreTaskPath Condition=" '$(ls-PublishIgnoreTaskPath)'=='' ">$(MSBuildProjectDirectory)\PubIgnore.Tasks.dll</ls-PublishIgnoreTaskPath>
   </PropertyGroup>
   
   <UsingTask TaskName ="ReadPublishIgnoreFile" AssemblyFile="$(ls-PublishIgnoreTaskPath)" />
-    
-  <!-- 
-  This file can be imported into a WAP to support ignoreing files to be publish
-  via a .publishIgnore file.
   -->
-
+  
   <PropertyGroup>
     <ls-ExcludeFilesByPublishIgnoreDependsOn>
       $(ls-ExcludeFilesByPublishIgnoreDependsOn);
@@ -52,8 +53,6 @@
     <ReadPublishIgnoreFile FilePath="%(PubIgnoreFiles.Identity)">
       <Output TaskParameter="LinesFromFile" ItemName="_ls-PubIgnore-LinesRead"/>
     </ReadPublishIgnoreFile>
-
-    <Message Text="**** Before ExcludeFromPackageFiles: @(ExcludeFromPackageFiles)" Importance="high" />
     
     <!-- Populate the ExcludeFromPackageFiles item -->
     <Message Text="Adding the following patterns to ExcludeFromPackageFiles: %0a%0d    @(_ls-PubIgnore-LinesRead->'%(Identity,'%0a0d    ')')" />
@@ -62,9 +61,60 @@
       <ExcludeFromPackageFiles Include="%(_ls-PubIgnore-LinesRead.Identity)">
         <FromTarget>ls-PublishIgnore</FromTarget>
       </ExcludeFromPackageFiles>
-    </ItemGroup>
-    
-    <Message Text="**** Before ExcludeFromPackageFiles: @(ExcludeFromPackageFiles)" Importance="high" />
+    </ItemGroup>  
   </Target>
   
+  <!-- Tasks defined below -->
+  <UsingTask TaskName="GetItemTemplateNameFromVSTemplatePath" TaskFactory="CodeTaskFactory" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.v4.0.dll">
+    <ParameterGroup>
+      <FilePath ParameterType="System.String" Required="true"/>
+
+      <!-- Outputs -->
+      <LinesFromFile ParameterType="Microsoft.Build.Framework.ITaskItem[]" Output="true"/>
+    </ParameterGroup>
+    <Task>
+      <Reference Include="System.Core" />
+      <Using Namespace="System" />
+      <Using Namespace="System.IO" />
+      <Using Namespace="System.Collections.Generic" />
+      <Using Namespace="Microsoft.Build.Framework" />
+      <Using Namespace="Microsoft.Build.Utilities" />
+      <Code Type="Fragment" Language="cs">
+        <![CDATA[
+            // read the file line by line and exclude any lines which start with # or 
+            //  just contain whitespace
+            Log.LogMessage("Starting to read .publishignore file at [{0}]", this.FilePath);
+
+            if (!File.Exists(FilePath)) {
+                string msg = string.Format("Unable to find the .publishIgnore file at [{0}]",this.FilePath);
+                Log.LogError(msg);
+                return false;
+            }
+
+            // TODO: do this better
+            string[] allLinesRaw = File.ReadAllLines(this.FilePath);
+
+            List<ITaskItem> linesNotComments = new List<ITaskItem>();
+            foreach(string line in allLinesRaw){
+                if (string.IsNullOrEmpty(line))
+                    continue;
+
+                // trim the line and see if it starts with #
+                string lineTrimmed = line.TrimStart();
+                if (lineTrimmed.StartsWith("#"))
+                    continue;
+
+                // add it to the list to be returned
+                linesNotComments.Add(new TaskItem(lineTrimmed));
+            }
+
+            this.LinesFromFile = linesNotComments.ToArray();
+
+            Log.LogMessage("Finished reading .publishIgnore file at [{0}]. Found [{0}] lines which are not comments or blank.", this.FilePath, this.LinesFromFile.Length);
+
+            return !Log.HasLoggedErrors;
+            ]]>
+      </Code>
+    </Task>
+  </UsingTask>
 </Project>
