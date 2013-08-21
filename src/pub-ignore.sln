@@ -3,9 +3,19 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PubIgnore.Tasks", "PubIgnore.Tasks\PubIgnore.Tasks.csproj", "{686972E4-30FA-4E4E-8794-3C3A4687017C}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "targets", "targets", "{F1E17BB7-5B7B-423E-94F4-140D7DAFA15D}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "files", "files", "{F1E17BB7-5B7B-423E-94F4-140D7DAFA15D}"
 	ProjectSection(SolutionItems) = preProject
+		..\build.cmd = ..\build.cmd
+		..\build.proj = ..\build.proj
 		ls.pubignore.wpp.targets = ls.pubignore.wpp.targets
+		ls.publishignore.nuspec = ls.publishignore.nuspec
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{EA52931C-C5C5-4DC8-B3C2-52EE1A3E3E5F}"
+	ProjectSection(SolutionItems) = preProject
+		.nuget\NuGet.Config = .nuget\NuGet.Config
+		.nuget\NuGet.exe = .nuget\NuGet.exe
+		.nuget\NuGet.targets = .nuget\NuGet.targets
 	EndProjectSection
 EndProject
 Global

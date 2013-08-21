@@ -63,7 +63,7 @@
   </PropertyGroup>
   <UsingTask TaskName="ReadPublishIgnoreFile" 
              TaskFactory="CodeTaskFactory" 
-             Condition=" '$(ls-PublishIgnoreTaskPath)'=='true' "
+             Condition=" '$(ls-DefineReadPublishIgnoreFileInline)'=='true' "
              AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.v4.0.dll">
     <ParameterGroup>
       <FilePath ParameterType="System.String" Required="true"/>

@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>PublishIgnore</id>
+    <version>1.0.0-beta</version>
+    <authors>Sayed Ibrahim Hashimi</authors>
+    <owners>Sayed Ibrahim Hashimi</owners>
+    <licenseUrl>http://www.apache.org/licenses/LICENSE-2.0</licenseUrl>
+    <!-- <projectUrl></projectUrl> -->
+    <!--<iconUrl>http://msbuildbook.com/images/pkgRestore.png</iconUrl>-->
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>You can use this to make excluding files from web publish simpler.</description>
+    <!-- <releaseNotes></releaseNotes> -->
+    <copyright>Copyright 2013 Sayed Ibrahim Hashimi</copyright>
+    <tags>ASP.NET Web Publish Ignore PublishIgnore</tags>
+    <!--<dependencies>
+      <dependency id="SampleDependency" version="1.0" />
+    </dependencies>-->
+  </metadata>
+</package>

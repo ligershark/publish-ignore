@@ -40,7 +40,25 @@
                     continue;
 
                 // trim the line and see if it starts with #
-                string pattern = this.ConvertPatternIfNecessary(line);
+                string pattern = line;
+
+                #region ConvertPatternIfNecessary - if this was defiend in an assembly this would be it's own method
+                if (!string.IsNullOrEmpty(pattern)) {
+                    pattern = pattern.Trim();
+                    if (pattern.StartsWith("!"))
+                    {
+                        throw new NotSupportedException("The ! operator is not currently supported in .publishignore");
+                    }
+
+                    // if its a directory we should append **\* to the end
+                    if (pattern.EndsWith(@"/") || pattern.EndsWith(@"\"))
+                    {
+                        pattern = string.Format(@"{0}**\*", pattern);
+                    }
+                }
+                #endregion
+
+
                 if (pattern.StartsWith("#"))
                     continue;
 
@@ -53,24 +71,6 @@
             Log.LogMessage("Finished reading .publishIgnore file at [{0}]. Found [{0}] lines which are not comments or blank.", this.FilePath, this.LinesFromFile.Length);
 
             return !Log.HasLoggedErrors;
-        }
-
-        internal string ConvertPatternIfNecessary(string pattern) {
-            if (string.IsNullOrEmpty(pattern)) {
-                return pattern;
-            }
-
-            string convertedPattern = pattern.Trim();
-            if (convertedPattern.StartsWith("!")) {
-                throw new NotSupportedException("The ! operator is not currently supported in .publishignore");
-            }
-
-            // if its a directory we should append **\* to the end
-            if (convertedPattern.EndsWith(@"/") || convertedPattern.EndsWith(@"\")) {
-                convertedPattern = string.Format(@"{0}**\*",convertedPattern);
-            }
-
-            return convertedPattern;
         }
     }
 }
