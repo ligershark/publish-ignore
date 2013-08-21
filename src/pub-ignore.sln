@@ -5,7 +5,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PubIgnore.Tasks", "PubIgnor
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "targets", "targets", "{F1E17BB7-5B7B-423E-94F4-140D7DAFA15D}"
 	ProjectSection(SolutionItems) = preProject
-		ligreshark.pubignore.targets = ligreshark.pubignore.targets
+		ls.pubignore.wpp.targets = ls.pubignore.wpp.targets
 	EndProjectSection
 EndProject
 Global
