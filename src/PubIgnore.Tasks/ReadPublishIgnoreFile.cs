@@ -6,7 +6,7 @@
     using System.IO;
 
     /// <summary>
-    /// This task will read the .publishIgnore file and return the results
+    /// This task will read the publish.ignore file and return the results
     /// </summary>
     public class ReadPublishIgnoreFile : Task {
         [Required]
@@ -23,10 +23,10 @@
             System.Diagnostics.Debugger.Launch();
             // read the file line by line and exclude any lines which start with # or 
             //  just contain whitespace
-            Log.LogMessage("Starting to read .publishignore file at [{0}]", this.FilePath);
+            Log.LogMessage("Starting to read publish.ignore file at [{0}]", this.FilePath);
 
             if (!File.Exists(FilePath)) {
-                string msg = string.Format("Unable to find the .publishIgnore file at [{0}]",this.FilePath);
+                string msg = string.Format("Unable to find the publish.ignore file at [{0}]",this.FilePath);
                 Log.LogError(msg);
                 return false;
             }
@@ -47,7 +47,7 @@
                     pattern = pattern.Trim();
                     if (pattern.StartsWith("!"))
                     {
-                        throw new NotSupportedException("The ! operator is not currently supported in .publishignore");
+                        throw new NotSupportedException("The ! operator is not currently supported in publish.ignore");
                     }
 
                     // if its a directory we should append **\* to the end
@@ -68,7 +68,7 @@
 
             this.LinesFromFile = linesNotComments.ToArray();
 
-            Log.LogMessage("Finished reading .publishIgnore file at [{0}]. Found [{0}] lines which are not comments or blank.", this.FilePath, this.LinesFromFile.Length);
+            Log.LogMessage("Finished reading publish.ignore file at [{0}]. Found [{0}] lines which are not comments or blank.", this.FilePath, this.LinesFromFile.Length);
 
             return !Log.HasLoggedErrors;
         }

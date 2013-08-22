@@ -9,6 +9,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "files", "files", "{F1E17BB7
 		..\build.proj = ..\build.proj
 		ls.pubignore.wpp.targets = ls.pubignore.wpp.targets
 		ls.publishignore.nuspec = ls.publishignore.nuspec
+		publish.ignore = publish.ignore
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{EA52931C-C5C5-4DC8-B3C2-52EE1A3E3E5F}"

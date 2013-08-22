@@ -31,7 +31,7 @@
     <!--<ToolsItems Include="$(SourceRoot)tools\Install.ps1" />-->
 
     <ContentItems Include="$(SourceRoot)ls.pubignore.wpp.targets" />
-    <ContentItems Include="$(SourceRoot).publishIgnore" />
+    <ContentItems Include="$(SourceRoot)publish.ignore" />
     <!--<ToolsItems Include="" />-->
     <!--<ContentItems Include="$(PublishPs1)">
       <DestDir>$(PackageDirectory)\</DestDir>

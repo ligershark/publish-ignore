@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <!-- 
   This file can be imported into a WAP to support ignoreing files to be publish
-  via a .publishIgnore file.
+  via a publish.ignore file.
   -->
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   
@@ -17,14 +17,14 @@
   <Target Name="ls-ExcludeFilesByPublishIgnore" DependsOnTargets="$(ls-ExcludeFilesByPublishIgnoreDependsOn)" />
 
   <Target Name="ls-FindPubIgnoreFiles">
-    <!-- For now let's just read the root folder, later we can support .publishIgnore files is other folders -->
+    <!-- For now let's just read the root folder, later we can support publish.ignore files is other folders -->
     <ItemGroup>
-      <PubIgnoreFiles Include="$(MSBuildProjectDirectory)\.publishIgnore" Condition=" Exists('$(MSBuildProjectDirectory)\.publishIgnore') "/>
+      <PubIgnoreFiles Include="$(MSBuildProjectDirectory)\publish.ignore" Condition=" Exists('$(MSBuildProjectDirectory)\publish.ignore') "/>
     </ItemGroup>
   </Target>
   
   <!--
-  This target will be executed once per .publishIgnore file
+  This target will be executed once per publish.ignore file
   -->
   <PropertyGroup>
     <ls-core-ExcludeFilesByPublishIgnoreDependsOn>
@@ -82,10 +82,10 @@
         <![CDATA[
             // read the file line by line and exclude any lines which start with # or 
             //  just contain whitespace
-            Log.LogMessage("Starting to read .publishignore file at [{0}]", this.FilePath);
+            Log.LogMessage("Starting to read publish.ignore file at [{0}]", this.FilePath);
 
             if (!File.Exists(FilePath)) {
-                string msg = string.Format("Unable to find the .publishIgnore file at [{0}]",this.FilePath);
+                string msg = string.Format("Unable to find the publish.ignore file at [{0}]",this.FilePath);
                 Log.LogError(msg);
                 return false;
             }
@@ -99,17 +99,35 @@
                     continue;
 
                 // trim the line and see if it starts with #
-                string lineTrimmed = line.TrimStart();
-                if (lineTrimmed.StartsWith("#"))
+                string pattern = line;
+
+                #region ConvertPatternIfNecessary - if this was defiend in an assembly this would be it's own method
+                if (!string.IsNullOrEmpty(pattern)) {
+                    pattern = pattern.Trim();
+                    if (pattern.StartsWith("!"))
+                    {
+                        throw new NotSupportedException("The ! operator is not currently supported in publish.ignore");
+                    }
+
+                    // if its a directory we should append **\* to the end
+                    if (pattern.EndsWith(@"/") || pattern.EndsWith(@"\"))
+                    {
+                        pattern = string.Format(@"{0}**\*", pattern);
+                    }
+                }
+                #endregion
+
+
+                if (pattern.StartsWith("#"))
                     continue;
 
                 // add it to the list to be returned
-                linesNotComments.Add(new TaskItem(lineTrimmed));
+                linesNotComments.Add(new TaskItem(pattern));
             }
 
             this.LinesFromFile = linesNotComments.ToArray();
 
-            Log.LogMessage("Finished reading .publishIgnore file at [{0}]. Found [{0}] lines which are not comments or blank.", this.FilePath, this.LinesFromFile.Length);
+            Log.LogMessage("Finished reading publish.ignore file at [{0}]. Found [{0}] lines which are not comments or blank.", this.FilePath, this.LinesFromFile.Length);
 
             return !Log.HasLoggedErrors;
             ]]>
