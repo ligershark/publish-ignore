@@ -1,3 +1,12 @@
-# You can declare files/folders that should be ignored here
+# You can declare files/folders that should be ignored here. For example
 
-foo.html
+# how to exclude files
+#	foo.html
+#	sayed*.html
+
+# how to exclude folders
+#	admin\
+#	private/
+
+# prevents this file from being published
+publish.ignore
