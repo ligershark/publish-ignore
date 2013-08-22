@@ -50,6 +50,13 @@
                         throw new NotSupportedException("The ! operator is not currently supported in publish.ignore");
                     }
 
+                    // for patterns that match file and that do not start with \ or / we should prepend **\
+                    if (!(pattern.EndsWith(@"\") || pattern.EndsWith(@"/"))) {
+                        if (!(pattern.StartsWith(@"\") || pattern.StartsWith(@"/"))) {
+                            pattern = string.Format(@"**\{0}",pattern);
+                        }
+                    }
+
                     // if its a directory we should append **\* to the end
                     if (pattern.EndsWith(@"/") || pattern.EndsWith(@"\"))
                     {
