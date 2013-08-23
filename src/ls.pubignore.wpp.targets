@@ -61,15 +61,15 @@
   <PropertyGroup>
     <ls-DefineReadPublishIgnoreFileInline Condition =" '$(ls-DefineReadPublishIgnoreFileInline)' == '' ">true</ls-DefineReadPublishIgnoreFileInline>
   </PropertyGroup>
-  <UsingTask TaskName="ReadPublishIgnoreFile" 
-             TaskFactory="CodeTaskFactory" 
+  <UsingTask TaskName="ReadPublishIgnoreFile"
+             TaskFactory="CodeTaskFactory"
              Condition=" '$(ls-DefineReadPublishIgnoreFileInline)'=='true' "
              AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.v4.0.dll">
     <ParameterGroup>
       <FilePath ParameterType="System.String" Required="true"/>
 
       <!-- Outputs -->
-      <LinesFromFile ParameterType="Microsoft.Build.Framework.ITaskItem[]" Output="true"/>
+      <LinesFromFile ParameterType="System.String[]" Output="true"/>
     </ParameterGroup>
     <Task>
       <Reference Include="System.Core" />
@@ -93,7 +93,8 @@
             // TODO: do this better
             string[] allLinesRaw = File.ReadAllLines(this.FilePath);
 
-            List<ITaskItem> linesNotComments = new List<ITaskItem>();
+            // System.Collections.Generic.List<Microsoft.Build.Framework.ITaskItem> linesNotComments = new System.Collections.Generic.List<Microsoft.Build.Framework.ITaskItem>();
+            System.Collections.Generic.List<string> linesNotComments = new System.Collections.Generic.List<string>();
             foreach(string line in allLinesRaw){
                 if (string.IsNullOrEmpty(line))
                     continue;
@@ -135,16 +136,24 @@
                     }
                 }
                 #endregion
-
+                
                 // add it to the list to be returned
-                linesNotComments.Add(new TaskItem(pattern));
+                // linesNotComments.Add(new Microsoft.Build.Utilities.TaskItem(pattern));
+                linesNotComments.Add(pattern);
             }
 
-            this.LinesFromFile = linesNotComments.ToArray();
+            // doesn't work from an inline task for some reason
+            // this.LinesFromFile = linesNotComments.ToArray();
+
+            // this.LinesFromFile = new Microsoft.Build.Framework.ITaskItem[linesNotComments.Count];
+            this.LinesFromFile = new string [linesNotComments.Count];
+            for (int i = 0; i < linesNotComments.Count; i++) {
+                this.LinesFromFile[i] = linesNotComments[i].ToString();
+            }
 
             Log.LogMessage("Finished reading publish.ignore file at [{0}]. Found [{0}] lines which are not comments or blank.", this.FilePath, this.LinesFromFile.Length);
 
-            return !Log.HasLoggedErrors;          
+            return !Log.HasLoggedErrors;
             ]]>
       </Code>
     </Task>

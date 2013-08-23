@@ -1,8 +1,5 @@
-﻿namespace PubIgnore.Tasks {
-    using Microsoft.Build.Framework;
-    using Microsoft.Build.Utilities;
+﻿namespace PubIgnore.Tasks {    
     using System;
-    using System.Collections.Generic;
     using System.IO;
 
     /// <summary>
@@ -17,7 +14,8 @@
         /// any comments in the file
         /// </summary>
         [Output]
-        public ITaskItem[] LinesFromFile { get; set; }        
+        //public ITaskItem[] LinesFromFile { get; set; }
+        public string[] LinesFromFile { get; set; }     
 
         public override bool Execute() {
             System.Diagnostics.Debugger.Launch();
@@ -34,7 +32,8 @@
             // TODO: do this better
             string[] allLinesRaw = File.ReadAllLines(this.FilePath);
 
-            List<ITaskItem> linesNotComments = new List<ITaskItem>();
+            // System.Collections.Generic.List<ITaskItem> linesNotComments = new System.Collections.Generic.List<ITaskItem>();
+            System.Collections.Generic.List<string> linesNotComments = new System.Collections.Generic.List<string>();
             foreach(string line in allLinesRaw){
                 if (string.IsNullOrEmpty(line))
                     continue;
@@ -78,10 +77,18 @@
                 #endregion
                 
                 // add it to the list to be returned
-                linesNotComments.Add(new TaskItem(pattern));
+                // linesNotComments.Add(new TaskItem(pattern));
+                linesNotComments.Add(pattern);
             }
 
-            this.LinesFromFile = linesNotComments.ToArray();
+            // doesn't work from an inline task for some reason
+            // this.LinesFromFile = linesNotComments.ToArray();
+
+            // this.LinesFromFile = new ITaskItem[linesNotComments.Count];
+            this.LinesFromFile = new string [linesNotComments.Count];
+            for (int i = 0; i < linesNotComments.Count; i++) {
+                this.LinesFromFile[i] = linesNotComments[i].ToString();
+            }
 
             Log.LogMessage("Finished reading publish.ignore file at [{0}]. Found [{0}] lines which are not comments or blank.", this.FilePath, this.LinesFromFile.Length);
 
