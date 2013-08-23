@@ -49,7 +49,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="samples\01.publishIgnore" />
-    <None Include="samples\ReadPublishIgnoreFile-sample.proj" />
+    <None Include="samples\ReadPublishIgnoreFile-sample.proj">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
