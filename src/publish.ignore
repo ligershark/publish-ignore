@@ -1,8 +1,9 @@
 # You can declare files/folders that should be ignored here. For example
 
 # how to exclude files
-#	foo.html
+#	sample.html
 #	sayed*.html
+#   \sayed.html
 
 # how to exclude folders
 #	admin\
@@ -10,3 +11,4 @@
 
 # prevents this file from being published
 publish.ignore
+*.wpp.targets

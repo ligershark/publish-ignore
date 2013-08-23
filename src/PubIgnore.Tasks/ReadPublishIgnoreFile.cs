@@ -42,6 +42,9 @@
                 // trim the line and see if it starts with #
                 string pattern = line;
 
+                if (pattern.StartsWith("#"))
+                    continue;
+
                 #region ConvertPatternIfNecessary - if this was defiend in an assembly this would be it's own method
                 if (!string.IsNullOrEmpty(pattern)) {
                     pattern = pattern.Trim();
@@ -57,6 +60,15 @@
                         }
                     }
 
+                    // for file patterns that start with \ or / we should 
+                    //  remove the leading slash because MSBuild assumes that
+                    //  don't match \\servername\file.name
+                    string fileThatStartsWithASlashPattern = @"^[\\,/]{1}[^\\,/].*\.[^/]*";
+                    if (System.Text.RegularExpressions.Regex.IsMatch(pattern, fileThatStartsWithASlashPattern)) {
+                        // \sample.txt or \folder\sub\somefile.txt
+                        pattern = pattern.Substring(1);
+                    }
+
                     // if its a directory we should append **\* to the end
                     if (pattern.EndsWith(@"/") || pattern.EndsWith(@"\"))
                     {
@@ -64,11 +76,7 @@
                     }
                 }
                 #endregion
-
-
-                if (pattern.StartsWith("#"))
-                    continue;
-
+                
                 // add it to the list to be returned
                 linesNotComments.Add(new TaskItem(pattern));
             }

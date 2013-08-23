@@ -48,7 +48,7 @@
     </ReadPublishIgnoreFile>
     
     <!-- Populate the ExcludeFromPackageFiles item -->
-    <Message Text="Adding the following patterns to ExcludeFromPackageFiles: %0a%0d    @(_ls-PubIgnore-LinesRead->'%(Identity,'%0a0d    ')')" />
+    <Message Text="Adding the following patterns to ExcludeFromPackageFiles: [@(_ls-PubIgnore-LinesRead->'%(Identity)')]" />
     
     <ItemGroup>
       <ExcludeFromPackageFiles Include="%(_ls-PubIgnore-LinesRead.Identity)">
@@ -101,6 +101,9 @@
                 // trim the line and see if it starts with #
                 string pattern = line;
 
+                if (pattern.StartsWith("#"))
+                    continue;
+
                 #region ConvertPatternIfNecessary - if this was defiend in an assembly this would be it's own method
                 if (!string.IsNullOrEmpty(pattern)) {
                     pattern = pattern.Trim();
@@ -116,6 +119,15 @@
                         }
                     }
 
+                    // for file patterns that start with \ or / we should 
+                    //  remove the leading slash because MSBuild assumes that
+                    //  don't match \\servername\file.name
+                    string fileThatStartsWithASlashPattern = @"^[\\,/]{1}[^\\,/].*\.[^/]*";
+                    if (System.Text.RegularExpressions.Regex.IsMatch(pattern, fileThatStartsWithASlashPattern)) {
+                        // \sample.txt or \folder\sub\somefile.txt
+                        pattern = pattern.Substring(1);
+                    }
+
                     // if its a directory we should append **\* to the end
                     if (pattern.EndsWith(@"/") || pattern.EndsWith(@"\"))
                     {
@@ -123,10 +135,6 @@
                     }
                 }
                 #endregion
-
-
-                if (pattern.StartsWith("#"))
-                    continue;
 
                 // add it to the list to be returned
                 linesNotComments.Add(new TaskItem(pattern));
@@ -136,7 +144,7 @@
 
             Log.LogMessage("Finished reading publish.ignore file at [{0}]. Found [{0}] lines which are not comments or blank.", this.FilePath, this.LinesFromFile.Length);
 
-            return !Log.HasLoggedErrors;            
+            return !Log.HasLoggedErrors;          
             ]]>
       </Code>
     </Task>
