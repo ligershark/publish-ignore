@@ -20,7 +20,6 @@
         // public string[] LinesFromFile { get; set; }     
 
         public override bool Execute() {
-            System.Diagnostics.Debugger.Launch();
             // read the file line by line and exclude any lines which start with # or 
             //  just contain whitespace
             Log.LogMessage("Starting to read publish.ignore file at [{0}]", this.FilePath);
