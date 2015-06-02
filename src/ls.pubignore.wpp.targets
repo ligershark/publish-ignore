@@ -4,8 +4,8 @@
   via a publish.ignore file.
   -->
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  
-  
+
+
   <PropertyGroup>
     <ls-ExcludeFilesByPublishIgnoreDependsOn>
       $(ls-ExcludeFilesByPublishIgnoreDependsOn);
@@ -13,7 +13,7 @@
       ls-core-ExcludeFilesByPublishIgnore;
     </ls-ExcludeFilesByPublishIgnoreDependsOn>
   </PropertyGroup>
-  
+
   <Target Name="ls-ExcludeFilesByPublishIgnore" DependsOnTargets="$(ls-ExcludeFilesByPublishIgnoreDependsOn)" />
 
   <Target Name="ls-FindPubIgnoreFiles">
@@ -22,7 +22,7 @@
       <PubIgnoreFiles Include="$(MSBuildProjectDirectory)\publish.ignore" Condition=" Exists('$(MSBuildProjectDirectory)\publish.ignore') "/>
     </ItemGroup>
   </Target>
-  
+
   <!--
   This target will be executed once per publish.ignore file
   -->
@@ -32,9 +32,9 @@
       ls-FindPubIgnoreFiles;
     </ls-core-ExcludeFilesByPublishIgnoreDependsOn>
   </PropertyGroup>
-  
-  <Target Name="ls-core-ExcludeFilesByPublishIgnore" 
-          Outputs="%(PubIgnoreFiles.Identity)" 
+
+  <Target Name="ls-core-ExcludeFilesByPublishIgnore"
+          Outputs="%(PubIgnoreFiles.Identity)"
           DependsOnTargets="$(ls-core-ExcludeFilesByPublishIgnoreDependsOn)"
           BeforeTargets="ExcludeFilesFromPackage">
     <!-- Read the file and add the patterns to the ExcludeFromPackageFiles item -->
@@ -46,17 +46,19 @@
     <ReadPublishIgnoreFile FilePath="%(PubIgnoreFiles.Identity)">
       <Output TaskParameter="LinesFromFile" ItemName="_ls-PubIgnore-LinesRead"/>
     </ReadPublishIgnoreFile>
-    
+
     <!-- Populate the ExcludeFromPackageFiles item -->
     <Message Text="Adding the following patterns to ExcludeFromPackageFiles: [@(_ls-PubIgnore-LinesRead->'%(Identity)')]" />
-    
+
     <ItemGroup>
       <ExcludeFromPackageFiles Include="%(_ls-PubIgnore-LinesRead.Identity)">
         <FromTarget>ls-PublishIgnore</FromTarget>
       </ExcludeFromPackageFiles>
-    </ItemGroup>  
+    </ItemGroup>
+
+    <Message Text="ExcludeFromPackageFiles: [@(ExcludeFromPackageFiles)]" Importance="low"/>
   </Target>
-  
+
   <!-- Tasks defined below -->
   <PropertyGroup>
     <ls-DefineReadPublishIgnoreFileInline Condition =" '$(ls-DefineReadPublishIgnoreFileInline)' == '' ">true</ls-DefineReadPublishIgnoreFileInline>
@@ -64,12 +66,12 @@
   <UsingTask TaskName="ReadPublishIgnoreFile"
              TaskFactory="CodeTaskFactory"
              Condition=" '$(ls-DefineReadPublishIgnoreFileInline)'=='true' "
-             AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.v4.0.dll">
+             AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.v$(MSBuildToolsVersion).dll">
     <ParameterGroup>
       <FilePath ParameterType="System.String" Required="true"/>
 
       <!-- Outputs -->
-      <LinesFromFile ParameterType="System.String[]" Output="true"/>
+      <LinesFromFile ParameterType="Microsoft.Build.Framework.ITaskItem[]" Output="true"/>
     </ParameterGroup>
     <Task>
       <Reference Include="System.Core" />
@@ -93,7 +95,7 @@
             // TODO: do this better
             string[] allLinesRaw = File.ReadAllLines(this.FilePath);
 
-            // System.Collections.Generic.List<Microsoft.Build.Framework.ITaskItem> linesNotComments = new System.Collections.Generic.List<Microsoft.Build.Framework.ITaskItem>();
+            // System.Collections.Generic.List<ITaskItem> linesNotComments = new System.Collections.Generic.List<ITaskItem>();
             System.Collections.Generic.List<string> linesNotComments = new System.Collections.Generic.List<string>();
             foreach(string line in allLinesRaw){
                 if (string.IsNullOrEmpty(line))
@@ -138,17 +140,17 @@
                 #endregion
                 
                 // add it to the list to be returned
-                // linesNotComments.Add(new Microsoft.Build.Utilities.TaskItem(pattern));
+                // linesNotComments.Add(new TaskItem(pattern));
                 linesNotComments.Add(pattern);
             }
 
             // doesn't work from an inline task for some reason
             // this.LinesFromFile = linesNotComments.ToArray();
 
-            // this.LinesFromFile = new Microsoft.Build.Framework.ITaskItem[linesNotComments.Count];
-            this.LinesFromFile = new string [linesNotComments.Count];
+            this.LinesFromFile = new ITaskItem[linesNotComments.Count];
+            //this.LinesFromFile = new string [linesNotComments.Count];
             for (int i = 0; i < linesNotComments.Count; i++) {
-                this.LinesFromFile[i] = linesNotComments[i].ToString();
+                this.LinesFromFile[i] = new TaskItem(linesNotComments[i]);
             }
 
             Log.LogMessage("Finished reading publish.ignore file at [{0}]. Found [{0}] lines which are not comments or blank.", this.FilePath, this.LinesFromFile.Length);
@@ -164,11 +166,11 @@
   The section below is only needed for debugging.
   If un-commented it will take precedence over the inline task above.
   You should also set ls-DefineReadPublishIgnoreFileInline=false from the cmd line.
-  -->  
+  -->
   <!--<PropertyGroup>
     <ls-PublishIgnoreTaskPath Condition=" '$(ls-PublishIgnoreTaskPath)'=='' ">$(MSBuildProjectDirectory)\PubIgnore.Tasks.dll</ls-PublishIgnoreTaskPath>
   </PropertyGroup>
   
   <UsingTask TaskName ="ReadPublishIgnoreFile" AssemblyFile="$(ls-PublishIgnoreTaskPath)" />-->
-  
+
 </Project>
