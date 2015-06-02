@@ -43,7 +43,7 @@
     TODO: when supporting more than just the .publishIngore in the root we will
           need to prefix the lines from the file with the relative path.
     -->
-    <ReadPublishIgnoreFile FilePath="%(PubIgnoreFiles.Identity)">
+    <ReadPublishIgnoreFile FilePath="%(PubIgnoreFiles.Identity)" Condition=" '%(PubIgnoreFiles.Identity)' !='' ">
       <Output TaskParameter="LinesFromFile" ItemName="_ls-PubIgnore-LinesRead"/>
     </ReadPublishIgnoreFile>
 
