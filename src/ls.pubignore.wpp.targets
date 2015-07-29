@@ -5,7 +5,6 @@
   -->
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
-
   <PropertyGroup>
     <ls-ExcludeFilesByPublishIgnoreDependsOn>
       $(ls-ExcludeFilesByPublishIgnoreDependsOn);
@@ -63,10 +62,16 @@
   <PropertyGroup>
     <ls-DefineReadPublishIgnoreFileInline Condition =" '$(ls-DefineReadPublishIgnoreFileInline)' == '' ">true</ls-DefineReadPublishIgnoreFileInline>
   </PropertyGroup>
+  <PropertyGroup Condition=" '$(ls-msbuildtasks-path)'=='' ">
+    <ls-msbuildtasks-path>$(MSBuildToolsPath)\Microsoft.Build.Tasks.v$(MSBuildToolsVersion).dll</ls-msbuildtasks-path>
+    <ls-msbuildtasks-path Condition=" !Exists('$(ls-msbuildtasks-path)')">$(MSBuildToolsPath)\Microsoft.Build.Tasks.v4.0.dll</ls-msbuildtasks-path>
+    <ls-msbuildtasks-path Condition=" !Exists('$(ls-msbuildtasks-path)')">$(MSBuildFrameworkToolsPath)\Microsoft.Build.Tasks.v4.0.dll</ls-msbuildtasks-path>
+    <ls-msbuildtasks-path Condition=" !Exists('$(ls-msbuildtasks-path)')">$(windir)\Microsoft.NET\Framework\v4.0.30319\Microsoft.Build.Tasks.v4.0.dll</ls-msbuildtasks-path>
+  </PropertyGroup>
   <UsingTask TaskName="ReadPublishIgnoreFile"
              TaskFactory="CodeTaskFactory"
              Condition=" '$(ls-DefineReadPublishIgnoreFileInline)'=='true' "
-             AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.v$(MSBuildToolsVersion).dll">
+             AssemblyFile="$(ls-msbuildtasks-path)">
     <ParameterGroup>
       <FilePath ParameterType="System.String" Required="true"/>
 
